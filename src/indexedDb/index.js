@@ -1,6 +1,6 @@
 import initDB from "./init";
 import { menuData } from "../temp/data";
-import { delNullprop } from "../lib";
+import { delNullprop } from "../utils";
 let userName = "admin";
 
 export default class MenuClass {
@@ -48,17 +48,16 @@ export default class MenuClass {
   // 更新数据
   async updateItem(menuId, data) {
     const time = new Date().getTime();
-    try {
-      await this.db
-        .where("menuId")
-        .equals(menuId)
-        .modify({
-          ...data,
-          updateTime: time,
-        });
-    } catch (err) {
-      console.error(err);
-    }
+    await this.db
+      .where("menuId")
+      .equals(menuId)
+      .modify({
+        ...data,
+        updateTime: time,
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   // 查询所有数据
@@ -84,19 +83,24 @@ export default class MenuClass {
   }
 
   // 通过名字查找
-  async getBySelect(obj) {
-    delNullprop(obj);
-    console.log(obj, "obj");
+  async getBySelect(selVal, searchVal) {
+    const handleObj = delNullprop(selVal);
     let menuArr = [];
-    try {
+    if (Object.keys(handleObj).length) {
       menuArr = await this.db
-        .where(obj)
-        // .where("foodName")
-        // .anyOfIgnoreCase(search)
-        .toArray();
-      console.log(menuArr, "menuArr");
-    } catch (err) {
-      console.error(err);
+        .where(handleObj)
+        .filter((item) => item.foodName.search(searchVal) != -1)
+        .toArray()
+        .catch((err) => {
+          console.error(err);
+        });
+    } else {
+      menuArr = await this.db
+        .filter((item) => item.foodName.search(searchVal) != -1)
+        .toArray()
+        .catch((err) => {
+          console.error(err);
+        });
     }
     return menuArr;
   }

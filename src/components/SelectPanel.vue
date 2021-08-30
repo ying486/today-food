@@ -35,6 +35,7 @@
       v-model:value="form.search"
       placeholder="搜索"
       style="width: 200px"
+      allowClear
       @change="onSearch"
     />
   </a-form>

@@ -26,7 +26,7 @@
   </div>
 </template>
 <script>
-import { defineComponent, reactive, toRefs, ref, toRaw } from "vue";
+import { defineComponent, reactive, toRefs, ref, toRaw, watch } from "vue";
 import { foodSelect } from "./config/selectPanel";
 import { nanoid } from "nanoid";
 import SelectPanel from "../components/SelectPanel.vue";
@@ -45,23 +45,28 @@ export default defineComponent({
   async setup() {
     // tesat.addData();
     let currentPage = ref(1); // 当前页数
-    let total = (await tesat.getAll()).length; // 总页数
+    let total = 0;
     let state = reactive({
       foodList: [],
       foodInfo: {},
       modalTitle: "",
       visible: false,
     });
+    let selVal = {};
+    let searchVal = "";
+    watch(state.foodList, (val) => {
+      total = val.length;
+    });
+    total = (await tesat.getAll()).length; // 总页数
     state.foodList = await tesat.getByPage(0, 10); //查询所有食物
 
     // 搜索面板
     const selData = async (data) => {
-      // const { type, season, search } = data;
-      state.foodList = await tesat.getBySelect(toRaw(data));
-      // if (data.search) {
-      // } else {
-      //   state.foodList = await tesat.getAll();
-      // }
+      console.log(toRaw(data), "data");
+      const { foodType, season, search } = toRaw(data);
+      selVal = { foodType, season };
+      searchVal = search;
+      state.foodList = await tesat.getBySelect(selVal, searchVal, 0, 10);
     };
 
     const onShowAddModal = () => {
@@ -81,8 +86,12 @@ export default defineComponent({
       state.visible = true;
     };
     // 添加食物
-    const getAddData = (data) => {
-      if (data) {
+    const getAddData = async (data) => {
+      console.log(data);
+      if (data || data.menuId) {
+        tesat.updateItem(data.menuId, data);
+        state.foodList = await tesat.getByPage(0, 10);
+      } else {
         tesat.addItem({
           ...data,
           menuId: nanoid(),
@@ -94,8 +103,14 @@ export default defineComponent({
     // 分页
     const onPageChange = async (page, pageSize) => {
       console.log(page, pageSize);
-      state.foodList = await tesat.getByPage((page - 1) * 10, pageSize);
+      state.foodList = await tesat.getByPage(
+        selVal,
+        searchVal,
+        (page - 1) * 10,
+        pageSize
+      );
     };
+
     return {
       foodSelect,
       currentPage,
