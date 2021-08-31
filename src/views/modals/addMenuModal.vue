@@ -59,8 +59,8 @@ import { foodTypeEnum, seasonEnum } from "../enum";
 export default defineComponent({
   props: {
     visible: Boolean,
-    fData: Object,
-    title: String,
+    data: Object, // 食物信息
+    title: String, // 标题
   },
   emits: {
     reData: (val) => {
@@ -72,11 +72,10 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const { visible, fData, title } = toRefs(props);
+    const { visible, data } = toRefs(props);
     const formRef = ref();
     let state = reactive({
       showModal: visible.value,
-      title: title.value,
     });
 
     // 确认
@@ -98,10 +97,7 @@ export default defineComponent({
     watch(visible, (val) => (state.showModal = val), {
       immediate: true,
     });
-    watch(title, (val) => (state.title = val), {
-      immediate: true,
-    });
-    watch(fData, (val) => (state.formState = val), {
+    watch(data, (val) => (state.formState = val), {
       immediate: true,
     });
     return {

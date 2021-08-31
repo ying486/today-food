@@ -71,7 +71,7 @@ export default class MenuClass {
     return menuArr;
   }
 
-  // 分页查询
+  // 分页查询x
   async getByPage(begin, pageSize) {
     let menuArr = [];
     try {

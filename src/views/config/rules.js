@@ -13,7 +13,6 @@ export const addMenuRules = {
       required: true,
       trigger: "change",
       validator: (rule, value) => {
-        console.log(value);
         if (value.length === 0) {
           return Promise.reject("请选择类型");
         }
@@ -26,7 +25,6 @@ export const addMenuRules = {
       required: true,
       trigger: "change",
       validator: (rule, value) => {
-        console.log(value);
         if (value.length === 0) {
           return Promise.reject("请选择季节");
         }
@@ -39,7 +37,6 @@ export const addMenuRules = {
       required: true,
       trigger: "change",
       validator: (rule, value) => {
-        console.log(value);
         if (value.length === 0) {
           return Promise.reject("请选择原料");
         }

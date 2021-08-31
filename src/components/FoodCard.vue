@@ -2,13 +2,13 @@
   <div class="food-card">
     <div class="name">{{ foodName }}</div>
     <div class="tag-panel">
-      <a-tag v-for="item in chTypeList" :key="item.key">{{ item }}</a-tag>
+      <a-tag v-for="(item, index) in chTypeList" :key="index">{{ item }}</a-tag>
     </div>
   </div>
 </template>
 
 <script>
-import { defineComponent, toRefs } from "vue";
+import { defineComponent, toRefs, reactive, watch } from "vue";
 import { foodTypeEnum } from "@/views/enum";
 
 export default defineComponent({
@@ -19,12 +19,22 @@ export default defineComponent({
   },
   setup(props) {
     const { typeList } = toRefs(props);
-    // 枚举转化
-    let chTypeList = typeList.value.map((item) => {
-      return foodTypeEnum.find((e) => e.value === item).label;
+    let state = reactive({
+      chTypeList: [], // 枚举转换类型
     });
+    // 食物类型枚举转化
+    const foodTypeCvrt = (arr) => {
+      return arr.map((item) => {
+        return foodTypeEnum.find((e) => e.value === item).label;
+      });
+    };
+    state.chTypeList = foodTypeCvrt(typeList.value);
+
+    // 监听食物类型改变
+    watch(typeList, (val) => (state.chTypeList = foodTypeCvrt(val)), {});
+
     return {
-      chTypeList,
+      ...toRefs(state),
     };
   },
 });
