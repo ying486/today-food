@@ -9,17 +9,17 @@
         @click="toRoute"
       >
         <a-menu-item key="Choose">
-          <span>抽抽乐</span>
+          <span>Choose</span>
         </a-menu-item>
         <a-menu-item key="Menu">
-          <span>全部菜品</span>
+          <span>Menu</span>
         </a-menu-item>
-        <a-menu-item key="Material">
+        <!-- <a-menu-item key="Material">
           <span>原料</span>
         </a-menu-item>
         <a-menu-item key="Seasoner">
           <span>调味料</span>
-        </a-menu-item>
+        </a-menu-item> -->
       </a-menu>
     </a-layout-sider>
 
