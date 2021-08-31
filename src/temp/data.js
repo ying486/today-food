@@ -6,7 +6,7 @@ export const menuData = [
     foodName: "大排面",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "1",
+    foodId: "1",
     season: ["1", "2"],
   },
   {
@@ -16,7 +16,7 @@ export const menuData = [
     foodName: "鱼香肉丝",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "2",
+    foodId: "2",
     season: ["1", "2"],
   },
   {
@@ -26,7 +26,7 @@ export const menuData = [
     foodName: "蛋炒饭",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "3",
+    foodId: "3",
     season: ["1", "2"],
   },
   {
@@ -36,7 +36,7 @@ export const menuData = [
     foodName: "红烧排骨",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "4",
+    foodId: "4",
     season: ["1", "2"],
   },
   {
@@ -46,7 +46,7 @@ export const menuData = [
     foodName: "草头",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "5",
+    foodId: "5",
     season: ["1", "2"],
   },
   {
@@ -56,7 +56,7 @@ export const menuData = [
     foodName: "素鸡",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "6",
+    foodId: "6",
     season: ["1", "2"],
   },
   {
@@ -66,7 +66,7 @@ export const menuData = [
     foodName: "麻婆豆腐",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "7",
+    foodId: "7",
     season: ["1", "2"],
   },
   {
@@ -76,7 +76,7 @@ export const menuData = [
     foodName: "红烧肉",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "8",
+    foodId: "8",
     season: ["1", "2"],
   },
   {
@@ -86,7 +86,7 @@ export const menuData = [
     foodName: "紫菜汤",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "9",
+    foodId: "9",
     season: ["1", "2"],
   },
   {
@@ -96,7 +96,7 @@ export const menuData = [
     foodName: "番茄炒蛋",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "10",
+    foodId: "10",
     season: ["1", "2"],
   },
   {
@@ -106,7 +106,7 @@ export const menuData = [
     foodName: "毛豆梭子蟹",
     foodType: ["hc", "zs"],
     material: ["1"],
-    menuId: "11",
+    foodId: "11",
     season: ["1", "2"],
   },
 ];

@@ -5,7 +5,7 @@
       <food-card
         class="food-card"
         v-for="item in pageList"
-        :key="item.menuId"
+        :key="item.foodId"
         :foodName="item.foodName"
         :typeList="item.foodType"
         @click="onShowEditModal(item)"
@@ -18,19 +18,31 @@
       :title="modalTitle"
       @reData="getAddData"
     ></add-menu-modal>
-    <a-pagination :pageSize="PAGE_SIZE" :total="total" @change="onPageChange" />
+    <a-pagination
+      v-model:current="currentPage"
+      :pageSize="PAGE_SIZE"
+      :total="total"
+      @change="onPageChange"
+    />
   </div>
 </template>
 <script>
-import { defineComponent, reactive, toRefs, ref, toRaw, watch } from "vue";
+import {
+  defineComponent,
+  reactive,
+  toRefs,
+  ref,
+  toRaw,
+  watch,
+  getCurrentInstance,
+} from "vue";
 import { foodSelect } from "./config/selectPanel";
-import { nanoid } from "nanoid";
 import SelectPanel from "../components/SelectPanel.vue";
 import foodCard from "../components/FoodCard.vue";
-import indexedDb from "../indexedDb";
+import menuDB from "../indexedDb/menu";
 import addMenuModal from "./modals/addMenuModal.vue";
 
-const tesat = new indexedDb();
+const db = new menuDB();
 
 export default defineComponent({
   components: {
@@ -39,8 +51,12 @@ export default defineComponent({
     addMenuModal,
   },
   async setup() {
-    // tesat.addData(); // 添加测试数据
+    const { $menuDb } = getCurrentInstance().appContext.config.globalProperties;
+    console.log($menuDb, "$menuDb");
+
+    // db.addData(); // 添加测试数据
     const PAGE_SIZE = 10;
+    let currentPage = ref(1);
     let total = ref(0);
     let state = reactive({
       foodList: [], // 总列表
@@ -59,7 +75,7 @@ export default defineComponent({
     const selData = async (data) => {
       console.log(toRaw(data), "data");
       const { foodType, season, search } = toRaw(data);
-      state.foodList = await tesat.getBySelect({ foodType, season }, search);
+      state.foodList = await db.getBySelect({ foodType, season }, search);
     };
 
     const onShowAddModal = () => {
@@ -81,29 +97,16 @@ export default defineComponent({
     // 添加食物
     const getAddData = async (data) => {
       if (data) {
-        data.menuId && tesat.updateItem(data.menuId, data);
-        !data.menuId &&
-          tesat.addItem({
-            ...data,
-            menuId: nanoid(),
-          });
+        data.menuId && db.updateItem(data.menuId, data);
+        !data.menuId && $menuDb.addItem(data);
         init();
       }
-      // if (data && data.menuId) {
-
-      //   init();
-      //   // state.foodList = await tesat.getByPage(0, 10);
-      // } else {
-      //   tesat.addItem({
-      //     ...data,
-      //     menuId: nanoid(),
-      //   });
-      //   init();
-      // }
       state.visible = false;
     };
     // 分页
     const onPageChange = async (page, pageSize) => {
+      console.log(page, pageSize);
+
       let begin = (page - 1) * pageSize;
       let end = page * pageSize < total.value ? page * pageSize : total.value;
       state.pageList = state.foodList.slice(begin, end);
@@ -111,14 +114,16 @@ export default defineComponent({
     // 数据初始化
     const init = async () => {
       console.log("初始化数据");
-      state.foodList = await tesat.getAll(); //查询所有食物
+      state.foodList = await $menuDb.getAll(); //查询所有食物
       total.value = state.foodList.length; // 总页数
       state.pageList = state.foodList.slice(0, PAGE_SIZE);
+      onPageChange(currentPage.value, PAGE_SIZE);
     };
     init();
 
     return {
       PAGE_SIZE,
+      currentPage,
       foodSelect,
       total,
       ...toRefs(state),
