@@ -39,10 +39,7 @@ import {
 import { foodSelect } from "./config/selectPanel";
 import SelectPanel from "../components/SelectPanel.vue";
 import foodCard from "../components/FoodCard.vue";
-import menuDB from "../indexedDb/menu";
 import addMenuModal from "./modals/addMenuModal.vue";
-
-const db = new menuDB();
 
 export default defineComponent({
   components: {
@@ -51,10 +48,7 @@ export default defineComponent({
     addMenuModal,
   },
   async setup() {
-    const { $menuDb } = getCurrentInstance().appContext.config.globalProperties;
-    console.log($menuDb, "$menuDb");
-
-    // db.addData(); // 添加测试数据
+    const { $menuDb } = getCurrentInstance().appContext.config.globalProperties; // menu数据库方法
     const PAGE_SIZE = 10;
     let currentPage = ref(1);
     let total = ref(0);
@@ -75,7 +69,8 @@ export default defineComponent({
     const selData = async (data) => {
       console.log(toRaw(data), "data");
       const { foodType, season, search } = toRaw(data);
-      state.foodList = await db.getBySelect({ foodType, season }, search);
+      state.foodList = await $menuDb.getBySelect({ foodType, season }, search);
+      onPageChange(currentPage.value, PAGE_SIZE);
     };
 
     const onShowAddModal = () => {
@@ -97,7 +92,7 @@ export default defineComponent({
     // 添加食物
     const getAddData = async (data) => {
       if (data) {
-        data.menuId && db.updateItem(data.menuId, data);
+        data.menuId && $menuDb.updateItem(data);
         !data.menuId && $menuDb.addItem(data);
         init();
       }
