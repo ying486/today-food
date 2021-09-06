@@ -36,15 +36,13 @@ const menuDb = {
   },
 
   /**
-   * @function 查询菜品数据
+   * @function 查询所有菜品数据
    * @return {Array} 包含所有菜品对象的数组
    */
   getAll: async () => {
-    let menuArr = [];
-    menuArr = await db.toArray().catch((err) => {
+    return await db.toArray().catch((err) => {
       console.error(err);
     });
-    return menuArr;
   },
 
   /**
@@ -67,21 +65,39 @@ const menuDb = {
 
   /**
    * @function 查询
-   * @param selVal {Object} 选择内容
+   * @param selVal {Object} 筛选条件
    * @param searchVal {String} 搜索内容
    * @return {Array} 包含所有菜品对象的数组
    */
   getBySelect: async (selVal, searchVal) => {
     const handleObj = delNullprop(selVal);
-    let menuArr = [];
     let flag = Object.keys(handleObj).length;
-    menuArr = await (flag ? db.where(handleObj) : db)
+
+    return await (flag ? db.where(handleObj) : db)
       .filter((item) => item.foodName.search(searchVal) != -1)
       .toArray()
       .catch((err) => {
         console.error(err);
       });
-    return menuArr;
+  },
+
+  /**
+   * @function 随机获取某个菜品
+   * @param data {Object} 筛选条件
+   * @return {Object} 菜品对象信息
+   * @description 键名必须是表中存在字段，否则是无效筛选
+   */
+  getRandomItem: async (data) => {
+    let foodArr = await db
+      .where(data)
+      .toArray()
+      .catch((err) => {
+        console.error(err);
+      });
+    if (foodArr && foodArr.length) {
+      let index = Math.floor(Math.random() * foodArr.length);
+      return foodArr[index];
+    }
   },
 };
 
