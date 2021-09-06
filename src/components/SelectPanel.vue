@@ -1,43 +1,43 @@
 <template>
   <a-form class="select-panel" :form="form">
-    <a-row>
-      <a-col
-        v-for="(item, key) in config"
-        :key="key"
-        :span="item.colSpan ? item.colSpan : 8"
+    <!-- <a-row>
+      <a-col> -->
+    <a-form-item
+      class="form-item"
+      v-for="(item, key) in config"
+      :key="key"
+      :label="item.label"
+      :label-col="{ span: 6 }"
+      :wrapper-col="{ span: 16 }"
+    >
+      <a-select
+        v-model:value="form[item.key]"
+        allowClear
+        placeholder="请选择"
+        :mode="item.mode ? item.mode : 'default'"
+        :maxTagCount="3"
+        @change="onChange"
       >
-        <a-form-item
-          class="form-item"
-          :label="item.label"
-          :label-col="item.labelCol ? item.labelCol : { span: 4 }"
-          :wrapper-col="item.wrapperCol ? item.wrapperCol : { span: 4 }"
+        <a-select-option
+          v-for="(opt, index) in item.optList"
+          :key="index"
+          :value="opt.value"
         >
-          <a-select
-            v-model:value="form[item.key]"
-            allowClear
-            placeholder="请选择"
-            :mode="item.mode ? item.mode : 'default'"
-            :maxTagCount="3"
-            @change="onChange"
-          >
-            <a-select-option
-              v-for="(opt, index) in item.optList"
-              :key="index"
-              :value="opt.value"
-            >
-              {{ opt.label }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-      </a-col>
-    </a-row>
-    <a-input-search
-      v-model:value="form.search"
-      placeholder="搜索"
-      style="width: 200px"
-      allowClear
-      @change="onSearch"
-    />
+          {{ opt.label }}
+        </a-select-option>
+      </a-select>
+    </a-form-item>
+    <!-- </a-col>
+    </a-row> -->
+    <a-form-item>
+      <a-input-search
+        v-model:value="form.search"
+        placeholder="搜索"
+        style="width: 200px"
+        allowClear
+        @change="onSearch"
+      />
+    </a-form-item>
   </a-form>
 </template>
 
@@ -100,5 +100,12 @@ export default defineComponent({
 
 <style scoped lang="less">
 .select-panel {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  .form-item {
+    width: 220px;
+  }
 }
 </style>

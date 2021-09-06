@@ -19,6 +19,7 @@
       @reData="getAddData"
     ></add-menu-modal>
     <a-pagination
+      class="pagination"
       v-model:current="currentPage"
       :pageSize="PAGE_SIZE"
       :total="total"
@@ -40,6 +41,7 @@ import { foodSelect } from "./config/selectPanel";
 import SelectPanel from "../components/SelectPanel.vue";
 import foodCard from "../components/FoodCard.vue";
 import addMenuModal from "./modals/addMenuModal.vue";
+// import { menuData } from "../temp/data";
 
 export default defineComponent({
   components: {
@@ -50,6 +52,7 @@ export default defineComponent({
   async setup() {
     const { $menuDb } = getCurrentInstance().appContext.config.globalProperties; // menu数据库方法
     const PAGE_SIZE = 10;
+    // $menuDb.addData(menuData);
     let currentPage = ref(1);
     let total = ref(0);
     let state = reactive({
@@ -92,8 +95,8 @@ export default defineComponent({
     // 添加食物
     const getAddData = async (data) => {
       if (data) {
-        data.menuId && $menuDb.updateItem(data);
-        !data.menuId && $menuDb.addItem(data);
+        data.foodId && $menuDb.updateItem(data);
+        !data.foodId && $menuDb.addItem(data);
         init();
       }
       state.visible = false;
@@ -101,16 +104,14 @@ export default defineComponent({
     // 分页
     const onPageChange = async (page, pageSize) => {
       console.log(page, pageSize);
-
+      total.value = state.foodList.length; // 总页数
       let begin = (page - 1) * pageSize;
       let end = page * pageSize < total.value ? page * pageSize : total.value;
       state.pageList = state.foodList.slice(begin, end);
     };
     // 数据初始化
     const init = async () => {
-      console.log("初始化数据");
       state.foodList = await $menuDb.getAll(); //查询所有食物
-      total.value = state.foodList.length; // 总页数
       state.pageList = state.foodList.slice(0, PAGE_SIZE);
       onPageChange(currentPage.value, PAGE_SIZE);
     };
@@ -134,12 +135,19 @@ export default defineComponent({
 
 <style lang="less">
 .menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   .card-container {
+    width: 100%;
     display: flex;
     flex-wrap: wrap;
     .food-card {
       margin: 10px;
     }
+  }
+  .pagination {
   }
 }
 </style>

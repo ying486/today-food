@@ -15,7 +15,7 @@
       </a-select>
     </a-card>
     <a-card @click="onAddCard" style="width: 300px"></a-card>
-    <a-button @click="onClick">cehsi</a-button>
+    <a-button @click="onRandomFood">cehsi</a-button>
   </div>
 </template>
 
@@ -48,8 +48,15 @@ export default defineComponent({
       ],
     });
     console.log("ceshi ", await $menuDb.getRandomItem({ foodType: "hc" }));
-    const onClick = () => {
+    const onRandomFood = async () => {
       console.log(state.chooseList, "choose");
+      let arr = [];
+      state.chooseList.forEach(async (item) => {
+        arr.push(await $menuDb.getRandomItem({ foodType: item.value }));
+      });
+      setTimeout(() => {
+        console.log(arr, "list");
+      }, 1000);
     };
     const onAddCard = () => {
       console.log("添加");
@@ -58,7 +65,7 @@ export default defineComponent({
     return {
       ...toRefs(state),
       foodTypeEnum,
-      onClick,
+      onRandomFood,
       onAddCard,
     };
   },

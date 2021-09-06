@@ -36,6 +36,17 @@ const menuDb = {
   },
 
   /**
+   * @function 删除一条菜品信息
+   * @param data {String} 主键(foodId)
+   * @return void
+   */
+  delItem: async (data) => {
+    await db.friends.delete(data).catch((err) => {
+      console.error(err);
+    });
+  },
+
+  /**
    * @function 查询所有菜品数据
    * @return {Array} 包含所有菜品对象的数组
    */
@@ -52,8 +63,8 @@ const menuDb = {
   updateItem: async (data) => {
     const time = new Date().Format("yyyy-MM-dd HH:mm:ss");
     await db
-      .where("menuId")
-      .equals(data.menuId)
+      .where("foodId")
+      .equals(data.foodId)
       .modify({
         ...data,
         updateTime: time,
@@ -96,6 +107,7 @@ const menuDb = {
       });
     if (foodArr && foodArr.length) {
       let index = Math.floor(Math.random() * foodArr.length);
+      console.log(index, foodArr[index]);
       return foodArr[index];
     }
   },
