@@ -6,12 +6,15 @@
         class="food-card"
         v-for="item in pageList"
         :key="item.foodId"
-        :foodName="item.foodName"
+        :name="item.foodName"
         :typeList="item.foodType"
+        :desc="item.desc"
+        :season="item.season"
         @click="onShowEditModal(item)"
       />
     </div>
     <a-button @click="onShowAddModal">添加数据</a-button>
+    <!-- <a-button @click="onUploadExl">导入数据</a-button> -->
     <add-menu-modal
       :data="foodInfo"
       :visible="visible"
@@ -42,6 +45,7 @@ import SelectPanel from "../components/SelectPanel.vue";
 import foodCard from "../components/FoodCard.vue";
 import addMenuModal from "./modals/addMenuModal.vue";
 // import { menuData } from "../temp/data";
+// import Excel from "../utils/excel";
 
 export default defineComponent({
   components: {
@@ -76,6 +80,12 @@ export default defineComponent({
       onPageChange(currentPage.value, PAGE_SIZE);
     };
 
+    // const onUploadExl = () => {
+    //   Excel.importExcel((data, dataRef) => {
+    //     console.log(data, "data");
+    //     console.log(dataRef, "dataRef");
+    //   });
+    // };
     const onShowAddModal = () => {
       state.foodInfo = {
         foodName: "",
@@ -128,6 +138,7 @@ export default defineComponent({
       onShowEditModal,
       getAddData,
       onPageChange,
+      // onUploadExl,
     };
   },
 });
@@ -135,6 +146,7 @@ export default defineComponent({
 
 <style lang="less">
 .menu {
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
