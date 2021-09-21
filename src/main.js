@@ -7,6 +7,7 @@ import "ant-design-vue/dist/antd.css";
 
 import menuDb from "./indexedDb/menuDb";
 import "./utils";
+import "./assets/css/common.less";
 
 const app = createApp(App);
 app.config.globalProperties.$menuDb = menuDb; // 菜单表

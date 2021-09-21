@@ -93,22 +93,23 @@ const menuDb = {
   },
 
   /**
-   * @function 随机获取某个菜品
-   * @param data {Object} 筛选条件
+   * @function 通过食物类型随机获取某个菜品
+   * @param data {Array} 食物类型
    * @return {Object} 菜品对象信息
-   * @description 键名必须是表中存在字段，否则是无效筛选
    */
   getRandomItem: async (data) => {
     let foodArr = await db
-      .where(data)
+      .where("foodType")
+      .anyOf(data)
       .toArray()
       .catch((err) => {
-        console.error(err);
+        console.error("err", err);
       });
     if (foodArr && foodArr.length) {
       let index = Math.floor(Math.random() * foodArr.length);
-      console.log(index, foodArr[index]);
       return foodArr[index];
+    } else {
+      return { foodType: data, err: "暂无相关菜品，请重新选择" };
     }
   },
 };

@@ -1,21 +1,51 @@
 <template>
   <div class="choose-container">
-    <a-card
-      v-for="(item, index) in chooseList"
-      :key="index"
-      style="width: 300px"
-    >
-      <a-select v-model:value="item.value" style="width: 200px">
-        <a-select-option
-          v-for="(opt, index) in foodTypeEnum"
-          :key="index"
-          :value="opt.value"
-          >{{ opt.label }}</a-select-option
-        >
-      </a-select>
-    </a-card>
-    <a-card @click="onAddCard" style="width: 300px"></a-card>
-    <a-button @click="onRandomFood">cehsi</a-button>
+    <div class="card-container">
+      <div v-for="(item, index) in chooseList" :key="index">
+        <!-- 选择卡 -->
+        <a-card class="card" v-if="!item.foodId">
+          <CloseCircleOutlined class="del-btn" @click="onDelCard(index)" />
+          <a-select v-model:value="item.foodType" style="width: 100px">
+            <a-select-option
+              v-for="(opt, optIndex) in foodTypeEnum"
+              :key="optIndex"
+              :value="opt.value"
+              >{{ opt.label }}</a-select-option
+            >
+          </a-select>
+          <p class="err-message" v-if="item.err">{{ item.err }}</p>
+        </a-card>
+        <!-- 展示卡 -->
+        <food-card
+          style="margin: 0 10px"
+          :class="{ locked: item.locked }"
+          v-if="item.foodId"
+          :name="item.foodName"
+          :typeList="item.foodType"
+          :desc="item.desc"
+          :season="item.season"
+          :flip="false"
+          @click="onLocked(index)"
+        />
+      </div>
+      <!-- 添加卡 -->
+      <a-card
+        class="card"
+        v-if="showAddCard && chooseList.length < 5"
+        @click="onAddCard"
+      >
+        <PlusOutlined :style="{ fontSize: '26px', color: '#666' }" />
+      </a-card>
+    </div>
+    <div class="btn-container">
+      <a-button class="choose-btn" :disabled="showAddCard" @click="onResetAll"
+        >全部重置</a-button
+      >
+      <a-button class="choose-btn" :disabled="showAddCard" @click="onReset"
+        >重置</a-button
+      >
+      <a-button class="choose-btn" @click="onRandomFood">抽取</a-button>
+    </div>
   </div>
 </template>
 
@@ -24,58 +54,144 @@ import {
   defineComponent,
   reactive,
   toRefs,
-  // ref,
+  ref,
   // toRaw,
   getCurrentInstance,
 } from "vue";
-import { nanoid } from "nanoid";
+import { Modal } from "ant-design-vue";
+import { PlusOutlined, CloseCircleOutlined } from "@ant-design/icons-vue";
 import { foodTypeEnum } from "./enum";
+import foodCard from "../components/FoodCard.vue";
 
 export default defineComponent({
-  components: {},
+  components: { foodCard, PlusOutlined, CloseCircleOutlined },
   async setup() {
     const { $menuDb } = getCurrentInstance().appContext.config.globalProperties; // menu数据库方法
     let state = reactive({
       chooseList: [
         {
-          id: "1",
-          value: "",
+          foodType: ["hc"],
         },
         {
-          id: "2",
-          value: "",
+          foodType: ["sc"],
+        },
+        {
+          foodType: ["zs"],
         },
       ],
     });
-    console.log("ceshi ", await $menuDb.getRandomItem({ foodType: "hc" }));
+    let showAddCard = ref(true); // 控制添加卡的显示隐藏
+
+    // 随机抽取菜品
     const onRandomFood = async () => {
-      console.log(state.chooseList, "choose");
-      let arr = [];
-      state.chooseList.forEach(async (item) => {
-        arr.push(await $menuDb.getRandomItem({ foodType: item.value }));
+      showAddCard.value = false;
+      state.chooseList.forEach(async (item, i, arr) => {
+        // 只抽取数组中未被锁定的
+        if (!arr[i].locked) {
+          arr[i] = await $menuDb.getRandomItem(item.foodType);
+          arr[i].locked = false;
+        }
       });
-      setTimeout(() => {
-        console.log(arr, "list");
-      }, 1000);
     };
+
+    // 重置全部选择卡
+    const onResetAll = () => {
+      Modal.confirm({
+        title: "提示",
+        content: "是否确定全部重置？",
+        okText: "确定",
+        cancelText: "取消",
+        onOk() {
+          showAddCard.value = true;
+          state.chooseList.forEach((item, i, arr) => {
+            arr[i] = { foodType: item.foodType };
+          });
+        },
+      });
+    };
+
+    // 重置部分选择卡
+    const onReset = () => {
+      showAddCard.value = true;
+      state.chooseList.forEach((item, i, arr) => {
+        if (!arr[i].locked) {
+          arr[i] = { foodType: item.foodType };
+        }
+      });
+    };
+
+    // 添加选择卡
     const onAddCard = () => {
-      console.log("添加");
-      state.chooseList.push({ id: nanoid(), value: "" });
+      state.chooseList.push({ foodType: ["hc"] });
+    };
+
+    // 锁定或解锁卡
+    const onLocked = (index) => {
+      state.chooseList[index].locked = !state.chooseList[index].locked;
+    };
+
+    // 删除卡
+    const onDelCard = (index) => {
+      state.chooseList.splice(index, 1);
     };
     return {
       ...toRefs(state),
+      showAddCard,
       foodTypeEnum,
       onRandomFood,
+      onResetAll,
+      onReset,
       onAddCard,
+      onLocked,
+      onDelCard,
     };
   },
 });
 </script>
 
 <style lang="less">
-#components-layout-demo-side .logo {
-  height: 32px;
-  background: rgba(255, 255, 255, 0.2);
-  margin: 16px;
+.choose-container {
+  height: 550px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  .card-container {
+    width: 790px;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+
+    .del-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      color: #666;
+    }
+
+    .card {
+      width: 150px;
+      height: 200px;
+      margin: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+
+      .err-message {
+        margin-top: 5px;
+        font-size: 12px;
+        color: red;
+      }
+    }
+  }
+
+  .locked {
+    opacity: 0.6;
+  }
+
+  .choose-btn {
+    margin: 0 10px;
+  }
 }
 </style>

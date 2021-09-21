@@ -1,40 +1,72 @@
 <template>
-  <div class="food-card">
-    <div class="name">{{ foodName }}</div>
-    <div class="tag-panel">
-      <a-tag v-for="(item, index) in chTypeList" :key="index">{{ item }}</a-tag>
+  <div class="food-card" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+    <div class="front">
+      <div class="name">{{ name }}</div>
+      <a-tag class="tag">{{ typeStr }}</a-tag>
+    </div>
+    <!-- 背面 -->
+    <div class="back">
+      <span class="desc">
+        {{ desc }}
+      </span>
     </div>
   </div>
 </template>
 
 <script>
-import { defineComponent, toRefs, reactive, watch } from "vue";
+import { defineComponent, ref, toRefs, watch } from "vue";
 import { foodTypeEnum } from "@/views/enum";
 
 export default defineComponent({
   name: "FoodCard",
   props: {
-    foodName: String,
+    name: String,
     typeList: Array,
+    desc: String,
+    season: String,
+    flip: {
+      type: Boolean,
+      default: true,
+    },
   },
   setup(props) {
-    const { typeList } = toRefs(props);
-    let state = reactive({
-      chTypeList: [], // 枚举转换类型
-    });
+    const { typeList, flip } = toRefs(props);
+    let typeStr = ref("");
+    // const color = ["#014483", "#03a877", "#a30404", "#0082aa"];
     // 食物类型枚举转化
     const foodTypeCvrt = (arr) => {
       return arr.map((item) => {
         return foodTypeEnum.find((e) => e.value === item).label;
       });
     };
-    state.chTypeList = foodTypeCvrt(typeList.value);
+
+    // 食物类型字符串拼接
+    const toString = (arr) => {
+      let str = "";
+      let chTypeList = foodTypeCvrt(arr);
+      chTypeList.forEach((item) => {
+        str += `${item}|`;
+      });
+      return str.slice(0, str.length - 1);
+    };
+
+    typeStr.value = toString(typeList.value);
+
+    const onMouseEnter = (e) => {
+      flip.value && (e.target.className = "food-card mouse-enter");
+    };
+
+    const onMouseLeave = (e) => {
+      flip.value && (e.target.className = "food-card");
+    };
 
     // 监听食物类型改变
-    watch(typeList, (val) => (state.chTypeList = foodTypeCvrt(val)), {});
+    watch(typeList, (val) => (typeStr.value = toString(val)), {});
 
     return {
-      ...toRefs(state),
+      typeStr,
+      onMouseEnter,
+      onMouseLeave,
     };
   },
 });
@@ -44,19 +76,64 @@ export default defineComponent({
 .food-card {
   width: 150px;
   height: 200px;
-  box-shadow: 0 0 10px 10px #f0f2f5 inset;
-  border-radius: 10px;
   padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: all 0.5s ease;
 
-  .name {
-  }
-
-  .tag-panel {
+  .front,
+  .back {
+    height: 100%;
     width: 100%;
-    padding: 5px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    backface-visibility: hidden;
+    background-color: #fff;
+    box-shadow: 0 0 10px 10px #f0f2f5 inset;
+    border-radius: 10px;
   }
+
+  .front {
+    .name {
+      height: 70%;
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translate(-50%, 0);
+      font-size: 18px;
+      writing-mode: vertical-lr;
+      letter-spacing: 10px;
+    }
+    .tag {
+      width: 100%;
+      position: absolute;
+      bottom: 20px;
+      letter-spacing: 5px;
+      color: #fff;
+      background-color: #014483;
+    }
+  }
+
+  .back {
+    padding: 25px;
+    transform: rotateY(180deg);
+    .desc {
+      text-indent: 1em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 7;
+      -webkit-box-orient: vertical;
+    }
+  }
+}
+.mouse-enter {
+  color: #014483;
+  transform: rotateY(180deg);
+  transition: all 0.5s ease;
 }
 </style>
