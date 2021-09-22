@@ -4,7 +4,7 @@
       <div v-for="(item, index) in chooseList" :key="index">
         <!-- 选择卡 -->
         <a-card class="card" v-if="!item.foodId">
-          <CloseCircleOutlined class="del-btn" @click="onDelCard(index)" />
+          <MinusOutlined class="del-btn" @click="onDelCard(index)" />
           <a-select v-model:value="item.foodType" style="width: 100px">
             <a-select-option
               v-for="(opt, optIndex) in foodTypeEnum"
@@ -18,7 +18,7 @@
         <!-- 展示卡 -->
         <food-card
           style="margin: 0 10px"
-          :class="{ locked: item.locked }"
+          :class="{ locked: item.locked && showBtnBar }"
           v-if="item.foodId"
           :name="item.foodName"
           :typeList="item.foodType"
@@ -37,14 +37,15 @@
         <PlusOutlined :style="{ fontSize: '26px', color: '#666' }" />
       </a-card>
     </div>
-    <div class="btn-container">
-      <a-button class="choose-btn" :disabled="showAddCard" @click="onResetAll"
+    <div class="btn-bar" v-show="showBtnBar">
+      <a-button class="btn" :disabled="showAddCard" @click="onResetAll"
         >全部重置</a-button
       >
-      <a-button class="choose-btn" :disabled="showAddCard" @click="onReset"
+      <a-button class="btn" :disabled="showAddCard" @click="onReset"
         >重置</a-button
       >
-      <a-button class="choose-btn" @click="onRandomFood">抽取</a-button>
+      <a-button class="btn" @click="onRandomFood">抽取</a-button>
+      <a-button class="btn" @click="onRecord">记录</a-button>
     </div>
   </div>
 </template>
@@ -59,14 +60,16 @@ import {
   getCurrentInstance,
 } from "vue";
 import { Modal } from "ant-design-vue";
-import { PlusOutlined, CloseCircleOutlined } from "@ant-design/icons-vue";
+import { PlusOutlined, MinusOutlined } from "@ant-design/icons-vue";
 import { foodTypeEnum } from "./enum";
 import foodCard from "../components/FoodCard.vue";
 
 export default defineComponent({
-  components: { foodCard, PlusOutlined, CloseCircleOutlined },
+  components: { foodCard, PlusOutlined, MinusOutlined },
   async setup() {
     const { $menuDb } = getCurrentInstance().appContext.config.globalProperties; // menu数据库方法
+    const { $dailyLogDB } =
+      getCurrentInstance().appContext.config.globalProperties; // dailyLogDB数据库方法
     let state = reactive({
       chooseList: [
         {
@@ -81,6 +84,7 @@ export default defineComponent({
       ],
     });
     let showAddCard = ref(true); // 控制添加卡的显示隐藏
+    let showBtnBar = ref(true); // 控制操作按钮隐藏
 
     // 随机抽取菜品
     const onRandomFood = async () => {
@@ -134,9 +138,30 @@ export default defineComponent({
     const onDelCard = (index) => {
       state.chooseList.splice(index, 1);
     };
+
+    // 添加当天记录
+    const onRecord = () => {
+      Modal.confirm({
+        title: "提示",
+        content: "是否添加记录？",
+        okText: "确定",
+        cancelText: "取消",
+        onOk() {
+          showBtnBar.value = false;
+          let data = state.chooseList.map((item) => {
+            return {
+              foodId: item.foodId,
+              foodName: item.foodName,
+            };
+          });
+          $dailyLogDB.addData({ foodArr: data });
+        },
+      });
+    };
     return {
       ...toRefs(state),
       showAddCard,
+      showBtnBar,
       foodTypeEnum,
       onRandomFood,
       onResetAll,
@@ -144,6 +169,7 @@ export default defineComponent({
       onAddCard,
       onLocked,
       onDelCard,
+      onRecord,
     };
   },
 });
@@ -190,7 +216,7 @@ export default defineComponent({
     opacity: 0.6;
   }
 
-  .choose-btn {
+  .btn {
     margin: 0 10px;
   }
 }
