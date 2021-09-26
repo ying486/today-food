@@ -7,12 +7,14 @@ const db = indexedDb && indexedDb.menu;
 
 const menuDb = {
   /**
-   * @function 添加测试数据
+   * @function 添加多条数据
    * @param data {Array} 包含菜品信息的数组
    * @return void
    */
-  addData: async (data) => {
-    await db.bulkAdd(data);
+  addItemList: async (data) => {
+    await db.bulkAdd(data).catch((err) => {
+      console.error(err);
+    });
   },
 
   /**

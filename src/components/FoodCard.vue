@@ -52,10 +52,12 @@ export default defineComponent({
 
     typeStr.value = toString(typeList.value);
 
+    // 监听鼠标进入
     const onMouseEnter = (e) => {
       flip.value && (e.target.className = "food-card mouse-enter");
     };
 
+    // 监听鼠标离开
     const onMouseLeave = (e) => {
       flip.value && (e.target.className = "food-card");
     };

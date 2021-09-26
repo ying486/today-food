@@ -1,4 +1,7 @@
 import XLSX from "xlsx";
+import { nanoid } from "nanoid";
+import { foodTypeMap, seasonMap } from "@/views/enum";
+
 /**
  * @function 导出Excel文件
  * @param {Object} json 服务端发过来的数据
@@ -35,7 +38,7 @@ function exportExcel(json, name) {
 
 /**
  * @function 导入excel文件并返回数据
- * @param {function} 回调函数参数data,dataRef,一个是数据，一个是exce表单的索引
+ * @param {function} 回调函数，返回数据data
  */
 function importExcel(callback) {
   var inputObj = document.createElement("input");
@@ -47,8 +50,8 @@ function importExcel(callback) {
   inputObj.addEventListener("change", (evt) => {
     const files = evt.target.files;
     if (files && files[0])
-      _file(files[0], (data, dataRef) => {
-        callback(data, dataRef);
+      _file(files[0], (data) => {
+        callback(data);
       });
   });
   document.body.appendChild(inputObj);
@@ -83,14 +86,20 @@ function _file(file, callback) {
     const ws = wb.Sheets[wsname];
     // 数据处理
     const data = XLSX.utils.sheet_to_json(ws);
+    console.log(data, "_file data");
     let handleData = [];
     data.forEach((item) => {
       let obj = {};
-      obj.foodName = item["foodName"];
-      obj.foodType = item["foodType"];
-      obj.season = item["season"];
-      obj.material = item["material"];
-      obj.desc = item["desc"];
+      obj.foodName = item["菜品名称"];
+      obj.foodType = _foodTypeTrans(_strtoArray(item["菜品类型"]));
+      obj.season = _seasonTrans(_strtoArray(item["季节"]));
+      obj.desc = item["描述"];
+
+      obj.createdBy = "admin";
+      obj.createdTime = new Date().Format("yyyy-MM-dd HH:mm:ss");
+      obj.updatedTime = new Date().Format("yyyy-MM-dd HH:mm:ss");
+      obj.foodId = nanoid();
+
       handleData.push(obj);
     });
     /* Update state */
@@ -111,9 +120,39 @@ function _getLength(obj) {
       count++;
     }
   }
-
   return count;
 }
+
+/**
+ * @function 字符串转数组
+ * @param {String}
+ * @return {Array} 按中英文逗号分割后的数组
+ */
+function _strtoArray(str) {
+  if (typeof str === "string") {
+    let temp = str.replace(/\s+/g, "");
+    return temp.split(/,|，/); // 按中英文逗号分割
+  }
+}
+
+/**
+ * @function 食物类型枚举转化
+ * @param {Array} 中文类型数组
+ * @return {Array} 英文类型数组
+ */
+function _foodTypeTrans(arr) {
+  return arr.map((item) => foodTypeMap.get(item));
+}
+
+/**
+ * @function 食物类型枚举转化
+ * @param {Array} 中文类型数组
+ * @return {Array} 英文类型数组
+ */
+function _seasonTrans(arr) {
+  return arr.map((item) => seasonMap.get(item));
+}
+
 export default {
   exportExcel,
   importExcel,

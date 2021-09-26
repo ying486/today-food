@@ -13,8 +13,11 @@
         @click="onShowEditModal(item)"
       />
     </div>
-    <a-button @click="onShowAddModal">添加数据</a-button>
-    <!-- <a-button @click="onUploadExl">导入数据</a-button> -->
+    <div class="btn-bar">
+      <a-button @click="onShowAddModal">添加数据</a-button>
+      <a-button @click="onUploadExl">导入数据</a-button>
+      <a-button @click="onExportExl">导出数据</a-button>
+    </div>
     <add-menu-modal
       :data="foodInfo"
       :visible="visible"
@@ -45,7 +48,7 @@ import SelectPanel from "../components/SelectPanel.vue";
 import foodCard from "../components/FoodCard.vue";
 import addMenuModal from "./modals/addMenuModal.vue";
 // import { menuData } from "../temp/data";
-// import Excel from "../utils/excel";
+import Excel from "../utils/excel";
 
 export default defineComponent({
   components: {
@@ -80,12 +83,6 @@ export default defineComponent({
       onPageChange(currentPage.value, PAGE_SIZE);
     };
 
-    // const onUploadExl = () => {
-    //   Excel.importExcel((data, dataRef) => {
-    //     console.log(data, "data");
-    //     console.log(dataRef, "dataRef");
-    //   });
-    // };
     const onShowAddModal = () => {
       state.foodInfo = {
         foodName: "",
@@ -102,6 +99,7 @@ export default defineComponent({
       state.modalTitle = "修改菜品信息";
       state.visible = true;
     };
+
     // 添加食物
     const getAddData = async (data) => {
       if (data) {
@@ -111,6 +109,21 @@ export default defineComponent({
       }
       state.visible = false;
     };
+
+    // 导入数据
+    const onUploadExl = () => {
+      Excel.importExcel(async (data) => {
+        console.log(data, "data");
+        await $menuDb.addItemList(data);
+        init();
+      });
+    };
+
+    // 导出数据
+    const onExportExl = () => {
+      Excel.exportExcel(state.foodList, "ceshi");
+    };
+
     // 分页
     const onPageChange = async (page, pageSize) => {
       console.log(page, pageSize);
@@ -119,6 +132,7 @@ export default defineComponent({
       let end = page * pageSize < total.value ? page * pageSize : total.value;
       state.pageList = state.foodList.slice(begin, end);
     };
+
     // 数据初始化
     const init = async () => {
       state.foodList = await $menuDb.getAll(); //查询所有食物
@@ -138,7 +152,8 @@ export default defineComponent({
       onShowEditModal,
       getAddData,
       onPageChange,
-      // onUploadExl,
+      onUploadExl,
+      onExportExl,
     };
   },
 });
