@@ -10,11 +10,12 @@
         :typeList="item.foodType"
         :desc="item.desc"
         :season="item.season"
-        @click="onShowEditModal(item)"
       />
+      <!-- @click="onShowEditModal(item)" -->
     </div>
     <div class="btn-bar">
       <a-button @click="onShowAddModal">添加数据</a-button>
+      <a-button @click="onDel">删除数据</a-button>
       <a-button @click="onUploadExl">导入数据</a-button>
       <a-button @click="onExportExl">导出数据</a-button>
     </div>
@@ -40,14 +41,12 @@ import {
   toRefs,
   ref,
   toRaw,
-  watch,
   getCurrentInstance,
 } from "vue";
 import { foodSelect } from "./config/selectPanel";
 import SelectPanel from "../components/SelectPanel.vue";
 import foodCard from "../components/FoodCard.vue";
 import addMenuModal from "./modals/addMenuModal.vue";
-// import { menuData } from "../temp/data";
 import Excel from "../utils/excel";
 
 export default defineComponent({
@@ -59,7 +58,6 @@ export default defineComponent({
   async setup() {
     const { $menuDb } = getCurrentInstance().appContext.config.globalProperties; // menu数据库方法
     const PAGE_SIZE = 10;
-    // $menuDb.addData(menuData);
     let currentPage = ref(1);
     let total = ref(0);
     let state = reactive({
@@ -69,10 +67,6 @@ export default defineComponent({
       foodInfo: {},
       modalTitle: "",
       visible: false,
-    });
-    // 监听食物列表
-    watch(state.foodList, (val) => {
-      console.log(val, "state.foodList");
     });
 
     // 搜索面板
@@ -108,6 +102,14 @@ export default defineComponent({
         init();
       }
       state.visible = false;
+    };
+
+    // 删除数据
+    const onDel = (e) => {
+      console.log(e, "e");
+      e.target.innerHTML =
+        e.target.innerHTML === "删除数据" ? "取消删除" : "删除数据";
+      // state.foodList.forEach
     };
 
     // 导入数据
@@ -151,6 +153,7 @@ export default defineComponent({
       onShowAddModal,
       onShowEditModal,
       getAddData,
+      onDel,
       onPageChange,
       onUploadExl,
       onExportExl,

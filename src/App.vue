@@ -14,10 +14,10 @@
         <a-menu-item key="Menu">
           <span>Menu</span>
         </a-menu-item>
-        <!-- <a-menu-item key="Material">
-          <span>原料</span>
+        <a-menu-item key="MenuTb">
+          <span>菜单管理</span>
         </a-menu-item>
-        <a-menu-item key="Seasoner">
+        <!-- <a-menu-item key="Seasoner">
           <span>调味料</span>
         </a-menu-item> -->
       </a-menu>

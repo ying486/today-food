@@ -7,20 +7,9 @@ const db = indexedDb && indexedDb.menu;
 
 const menuDb = {
   /**
-   * @function 添加多条数据
-   * @param data {Array} 包含菜品信息的数组
-   * @return void
-   */
-  addItemList: async (data) => {
-    await db.bulkAdd(data).catch((err) => {
-      console.error(err);
-    });
-  },
-
-  /**
    * @function 添加一条菜品信息
    * @param data {Object} 菜品信息
-   * @return void
+   * @return {void}
    */
   addItem: async (data) => {
     const time = new Date().Format("yyyy-MM-dd HH:mm:ss");
@@ -34,17 +23,43 @@ const menuDb = {
       })
       .catch((err) => {
         console.error(err);
+        return err;
       });
+  },
+
+  /**
+   * @function 添加多条数据
+   * @param data {Array} 包含菜品信息的数组
+   * @return {void}
+   */
+  addItemList: async (data) => {
+    await db.bulkAdd(data).catch((err) => {
+      console.error(err);
+      return err;
+    });
   },
 
   /**
    * @function 删除一条菜品信息
    * @param data {String} 主键(foodId)
-   * @return void
+   * @return {void}
    */
   delItem: async (data) => {
-    await db.friends.delete(data).catch((err) => {
+    await db.delete(data).catch((err) => {
       console.error(err);
+      return err;
+    });
+  },
+
+  /**
+   * @function 删除多条菜品信息
+   * @param data {Array} 删除对象的主键的数组
+   * @return {void}
+   */
+  delItemList: async (data) => {
+    await db.bulkDelete(data).catch((err) => {
+      console.error(err);
+      return err;
     });
   },
 
@@ -55,6 +70,7 @@ const menuDb = {
   getAll: async () => {
     return await db.toArray().catch((err) => {
       console.error(err);
+      return err;
     });
   },
 
@@ -73,6 +89,7 @@ const menuDb = {
       })
       .catch((err) => {
         console.error(err);
+        return err;
       });
   },
 
@@ -91,6 +108,7 @@ const menuDb = {
       .toArray()
       .catch((err) => {
         console.error(err);
+        return err;
       });
   },
 
@@ -106,6 +124,7 @@ const menuDb = {
       .toArray()
       .catch((err) => {
         console.error("err", err);
+        return err;
       });
     if (foodArr && foodArr.length) {
       let index = Math.floor(Math.random() * foodArr.length);
