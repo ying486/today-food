@@ -31,3 +31,14 @@ export const seasonMap = new Map([
   ["秋季", "3"],
   ["冬季", "4"],
 ]);
+
+export const nameTransMap = new Map([
+  ["foodId", "菜品编号"],
+  ["foodName", "菜品名称"],
+  ["foodType", "菜品类型"],
+  ["season", "季节"],
+  ["desc", "描述"],
+  ["updatedTime", "更新时间"],
+  ["createdTime", "创建时间"],
+  ["createdBy", "创建人"],
+]);
