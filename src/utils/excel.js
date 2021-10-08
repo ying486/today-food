@@ -1,6 +1,6 @@
 import XLSX from "xlsx";
 import { nanoid } from "nanoid";
-import { foodTypeMap, seasonMap } from "@/views/enum";
+import { foodTypeEnum, seasonEnum, nameTransMap } from "@/views/enum";
 
 /**
  * @function 导出Excel文件
@@ -11,17 +11,28 @@ function exportExcel(json, name) {
   /* convert state to workbook */
   var data = new Array();
   var keyArray = new Array();
-
+  console.log(json, "json");
+  // 行
   for (const key1 in json) {
     if (Object.prototype.hasOwnProperty.call(json, key1)) {
       const element = json[key1];
       var rowDataArray = new Array();
+      // 列
       for (const key2 in element) {
         if (Object.prototype.hasOwnProperty.call(element, key2)) {
-          const element2 = element[key2];
-          rowDataArray.push(element2);
+          switch (key2) {
+            case "foodType":
+              rowDataArray.push(_foodTypeTrans(element[key2], "label"));
+              break;
+            case "season":
+              rowDataArray.push(_seasonTrans(element[key2], "label"));
+              break;
+            default:
+              rowDataArray.push(element[key2]);
+              break;
+          }
           if (keyArray.length < _getLength(element)) {
-            keyArray.push(key2);
+            keyArray.push(nameTransMap.get(key2));
           }
         }
       }
@@ -29,6 +40,7 @@ function exportExcel(json, name) {
     }
   }
   data.splice(0, 0, keyArray);
+  console.log(data, "data");
   const ws = XLSX.utils.aoa_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "SheetJS");
@@ -140,17 +152,23 @@ function _strtoArray(str) {
  * @param {Array} 中文类型数组
  * @return {Array} 英文类型数组
  */
-function _foodTypeTrans(arr) {
-  return arr.map((item) => foodTypeMap.get(item));
+function _foodTypeTrans(arr, target = "value") {
+  const compare = target === "value" ? "label" : "value";
+  return arr.map((item) => {
+    return foodTypeEnum.find((e) => e[compare] === item)[target];
+  });
 }
 
 /**
- * @function 食物类型枚举转化
+ * @function 季节类型枚举转化
  * @param {Array} 中文类型数组
  * @return {Array} 英文类型数组
  */
-function _seasonTrans(arr) {
-  return arr.map((item) => seasonMap.get(item));
+function _seasonTrans(arr, target = "value") {
+  const compare = target === "value" ? "label" : "value";
+  return arr.map((item) => {
+    return seasonEnum.find((e) => e[compare] === item)[target];
+  });
 }
 
 export default {
