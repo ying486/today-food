@@ -10,10 +10,12 @@ export const menuTbColumns = [
   {
     title: "类型",
     dataIndex: "foodType",
+    slots: { customRender: "foodType" },
   },
   {
     title: "季节",
     dataIndex: "season",
+    slots: { customRender: "season" },
   },
   {
     title: "更新时间",
@@ -26,5 +28,12 @@ export const menuTbColumns = [
   {
     title: "创建人",
     dataIndex: "createdBy",
+  },
+  {
+    title: "操作",
+    key: "operation",
+    fixed: "right",
+    width: 100,
+    slots: { customRender: "action" },
   },
 ];

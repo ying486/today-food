@@ -1,13 +1,23 @@
 <template>
   <div class="menu-tb">
-    <div class="action-container">
-      <span style="margin-left: 8px">
+    <div class="header-container">
+      <span>
         {{ `共有 ${foodList.length} 条数据` }}
       </span>
-      <a-button @click="onUploadExl">导入</a-button>
-      <a-button @click="onExportExl">导出</a-button>
-      <a-button @click="onShowAddModal">添加</a-button>
-      <a-button @click="onDel">删除</a-button>
+      <div class="btn-container">
+        <g-button tip="导入"
+          ><template #icon><ImportOutlined /></template
+        ></g-button>
+        <g-button tip="导出"
+          ><template #icon><ExportOutlined /></template
+        ></g-button>
+        <g-button tip="添加"
+          ><template #icon><PlusSquareOutlined /></template
+        ></g-button>
+        <g-button tip="删除"
+          ><template #icon><DeleteOutlined /></template
+        ></g-button>
+      </div>
     </div>
     <a-table
       rowKey="foodId"
@@ -17,7 +27,27 @@
       }"
       :columns="menuTbColumns"
       :data-source="foodList"
-    />
+    >
+      <template #foodType="{ text: foodType }">
+        <a-tag
+          v-for="item in foodTypeCvrt(foodType)"
+          :key="item"
+          :color="volcano"
+        >
+          {{ item }}
+        </a-tag>
+      </template>
+      <template #season="{ text: season }">
+        <span v-for="item in seasonCvrt(season)" :key="item">
+          {{ item }}
+        </span>
+      </template>
+      <template #action="{ record }">
+        <span @click="onShowEditModal(record)">
+          <a>edit</a>
+        </span>
+      </template>
+    </a-table>
     <add-menu-modal
       :data="foodInfo"
       :visible="visible"
@@ -36,14 +66,27 @@ import {
   getCurrentInstance,
 } from "vue";
 import { Modal, message } from "ant-design-vue";
+import {
+  ImportOutlined,
+  ExportOutlined,
+  DeleteOutlined,
+  PlusSquareOutlined,
+} from "@ant-design/icons-vue";
+import gButton from "../components/g-button.vue";
 import addMenuModal from "./modals/addMenuModal.vue";
 import { menuTbColumns } from "./config/colums";
 import Excel from "../utils/excel";
+import { foodTypeEnum, seasonEnum } from "@/views/enum";
 
 export default defineComponent({
   components: {
     // SelectPanel,
     addMenuModal,
+    ImportOutlined,
+    ExportOutlined,
+    DeleteOutlined,
+    PlusSquareOutlined,
+    gButton,
   },
   async setup() {
     const { $menuDb } = getCurrentInstance().appContext.config.globalProperties; // menu数据库方法
@@ -55,6 +98,20 @@ export default defineComponent({
       modalTitle: "",
       visible: false,
     });
+
+    // 食物类型枚举转化
+    const foodTypeCvrt = (arr) => {
+      return arr.map((item) => {
+        return foodTypeEnum.find((e) => e.value === item).label;
+      });
+    };
+
+    // 季节类型枚举转化
+    const seasonCvrt = (arr) => {
+      return arr.map((item) => {
+        return seasonEnum.find((e) => e.value === item).label;
+      });
+    };
 
     const onSelectChange = (selectedRowKeys) => {
       state.selectedRowKeys = selectedRowKeys;
@@ -73,6 +130,12 @@ export default defineComponent({
       state.visible = true;
     };
 
+    // 显示编辑模态框
+    const onShowEditModal = (data) => {
+      state.foodInfo = data;
+      state.modalTitle = "修改菜品";
+      state.visible = true;
+    };
     // 添加食物
     const getAddData = async (data) => {
       if (data) {
@@ -138,17 +201,23 @@ export default defineComponent({
       onSelectChange,
       onShowAddModal,
       getAddData,
+      onShowEditModal,
       onDel,
       onUploadExl,
       onExportExl,
+      foodTypeCvrt,
+      seasonCvrt,
     };
   },
 });
 </script>
 <style lang="less">
 .menu-tb {
-  .action-container {
+  .header-container {
     margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 }
 </style>
