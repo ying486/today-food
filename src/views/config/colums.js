@@ -33,6 +33,7 @@ export const menuTbColumns = [
     title: "操作",
     key: "operation",
     fixed: "right",
+    align: "center",
     width: 100,
     slots: { customRender: "action" },
   },

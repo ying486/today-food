@@ -44,7 +44,8 @@
       </template>
       <template #action="{ record }">
         <span @click="onShowEditModal(record)">
-          <a>edit</a>
+          <FormOutlined :style="{ fontSize: '20px' }" />
+          <!-- <a>edit</a> -->
         </span>
       </template>
     </a-table>
@@ -67,6 +68,7 @@ import {
 } from "vue";
 import { Modal, message } from "ant-design-vue";
 import {
+  FormOutlined,
   ImportOutlined,
   ExportOutlined,
   DeleteOutlined,
@@ -82,6 +84,7 @@ export default defineComponent({
   components: {
     // SelectPanel,
     addMenuModal,
+    FormOutlined,
     ImportOutlined,
     ExportOutlined,
     DeleteOutlined,

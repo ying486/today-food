@@ -37,7 +37,7 @@
         <PlusOutlined :style="{ fontSize: '26px', color: '#666' }" />
       </a-card>
     </div>
-    <div class="btn-bar" v-show="showBtnBar">
+    <div class="flexr-csa" v-show="showBtnBar">
       <a-button class="btn" :disabled="showAddCard" @click="onResetAll"
         >全部重置</a-button
       >
