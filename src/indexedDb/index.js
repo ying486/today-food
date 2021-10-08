@@ -5,8 +5,8 @@ const dbName = "today_food_database";
 const db = new Dexie(dbName);
 // 这里可以定义版本号，后续修改表字段时可以增加版本号
 db.version(10).stores({
-  menu: `&foodId,foodName,*foodType,*season,*material,updatedTime,createdTime,createBy`,
-  daily_log: `&logId,foodArr,createdTime,createBy`,
+  menu: `&foodId,foodName,*foodType,*season,*material,desc,updatedTime,createdTime,createdBy`,
+  daily_log: `&logId,foodArr,createdTime,createdBy`,
 });
 
 console.log("创建/打开数据库成功");
