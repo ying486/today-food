@@ -23,7 +23,7 @@ export default defineComponent({
     name: String,
     typeList: Array,
     desc: String,
-    season: String,
+    // season: String,
     // 卡片翻转
     flip: {
       type: Boolean,

@@ -9,7 +9,6 @@
         :name="item.foodName"
         :typeList="item.foodType"
         :desc="item.desc"
-        :season="item.season"
       />
     </div>
     <a-pagination

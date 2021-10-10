@@ -23,7 +23,6 @@
           :name="item.foodName"
           :typeList="item.foodType"
           :desc="item.desc"
-          :season="item.season"
           :flip="false"
           @click="onLocked(index)"
         />
@@ -59,7 +58,7 @@ import {
   // toRaw,
   getCurrentInstance,
 } from "vue";
-import { Modal } from "ant-design-vue";
+import { Modal, message } from "ant-design-vue";
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons-vue";
 import { foodTypeEnum } from "./enum";
 import foodCard from "../components/FoodCard.vue";
@@ -88,6 +87,10 @@ export default defineComponent({
 
     // 随机抽取菜品
     const onRandomFood = async () => {
+      if (!state.chooseList.length) {
+        message.info("请先添加卡片");
+        return;
+      }
       showAddCard.value = false;
       state.chooseList.forEach(async (item, i, arr) => {
         // 只抽取数组中未被锁定的
@@ -177,13 +180,14 @@ export default defineComponent({
 
 <style lang="less">
 .choose-container {
+  width: 100%;
   height: 550px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
   .card-container {
-    width: 790px;
+    width: 850px;
     display: flex;
     flex-direction: row;
     position: relative;

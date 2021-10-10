@@ -1,86 +1,110 @@
 <template>
-  <a-layout id="components-layout-demo-side" style="min-height: 100vh">
-    <a-layout-sider v-model="collapsed" collapsible>
-      <div class="logo"></div>
-      <a-menu
-        theme="dark"
-        :default-selected-keys="['Choose']"
-        mode="inline"
-        @click="toRoute"
-      >
-        <a-menu-item key="Choose">
-          <span>Choose</span>
-        </a-menu-item>
-        <a-menu-item key="Menu">
-          <span>Menu</span>
-        </a-menu-item>
-        <a-menu-item key="MenuTb">
-          <span>菜单管理</span>
-        </a-menu-item>
-        <!-- <a-menu-item key="Seasoner">
-          <span>调味料</span>
-        </a-menu-item> -->
-      </a-menu>
-    </a-layout-sider>
-
-    <a-layout>
-      <a-layout-header class="layout-header">{{ title }}</a-layout-header>
-      <a-layout-content class="layout-content">
-        <div>
-          <suspense>
-            <router-view></router-view>
-          </suspense>
-        </div>
-      </a-layout-content>
-
-      <a-layout-footer class="layout-footer">
-        APP ©2021 Created by GREEN
-      </a-layout-footer>
-    </a-layout>
-  </a-layout>
+  <div id="app">
+    <div class="logo">
+      <SmileOutlined
+        class="switch-icon fs40"
+        v-if="!rootMode"
+        @click="onSwitchMode"
+      />
+      <FrownOutlined
+        class="switch-icon fs40"
+        v-if="rootMode"
+        @click="onSwitchMode"
+      />
+    </div>
+    <RollbackOutlined
+      class="go-back fs40"
+      v-if="showBackIc"
+      @click="goBack()"
+    />
+    <suspense>
+      <router-view />
+    </suspense>
+  </div>
 </template>
 
 <script>
-import router from "./router";
+import { defineComponent, ref, watch, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import {
+  SmileOutlined,
+  FrownOutlined,
+  RollbackOutlined,
+} from "@ant-design/icons-vue";
 
-export default {
-  data() {
+export default defineComponent({
+  components: {
+    SmileOutlined,
+    FrownOutlined,
+    RollbackOutlined,
+  },
+  setup() {
+    const router = useRouter();
+    const route = useRoute();
+    let rootMode = ref(false);
+
+    // 模式切换
+    const onSwitchMode = () => {
+      rootMode.value = !rootMode.value;
+      const routerName = rootMode.value ? "Root" : "Pure";
+      router.push({ name: routerName });
+    };
+
+    // 回退图标显示
+    const showBackIc = computed(() => {
+      const routeArr = route.path.match(/\w+/g);
+      if (routeArr) {
+        console.log(routeArr, "arr");
+        console.log(!rootMode.value && routeArr.length > 1, "res");
+        return !rootMode.value && routeArr.length > 1;
+      }
+      console.log("fase");
+      return false;
+    });
+
+    // 回退
+    const goBack = () => {
+      router.back();
+    };
+
+    // 监听当前路由进行判断
+    watch(
+      () => route.path,
+      (val) => {
+        const routeArr = val.match(/\w+/g);
+        rootMode.value = routeArr[0] === "Root" ? true : false;
+      }
+    );
+
     return {
-      title: "",
+      rootMode,
+      showBackIc,
+      // func
+      onSwitchMode,
+      goBack,
     };
   },
-  methods: {
-    toRoute({ key }) {
-      this.title = key;
-      router.push({ path: `/${key}` });
-    },
-  },
-  created() {},
-  unmounted() {},
-};
+});
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-}
-#components-layout-demo-side {
-  .layout-header {
-    background-color: #fff;
-    margin: 0 0 16px 0;
+
+  .switch-icon {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 999;
   }
-  .layout-content {
-    margin: 0 16px;
-    padding: 24px;
-    background-color: #fff;
-    min-height: 360px;
-  }
-  .layout-footer {
-    padding: 10px;
-    text-align: center;
+  .go-back {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
   }
 }
 </style>

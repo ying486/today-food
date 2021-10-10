@@ -3,24 +3,51 @@ import { createRouter, createWebHistory } from "vue-router";
 const routes = [
   {
     path: "/",
-    redirect: "/Choose",
+    redirect: "/Pure",
   },
   {
-    path: "/Choose",
-    name: "Choose",
-    component: () =>
-      import(/* webpackChunkName: "choose" */ "../views/Choose.vue"),
+    path: "/Pure",
+    name: "Pure",
+    component: () => import(/* webpackChunkName: "Pure" */ "../views/Pure.vue"),
+    children: [
+      {
+        path: "choose",
+        name: "pureChoose",
+        component: () =>
+          import(/* webpackChunkName: "choose" */ "../views/Choose.vue"),
+      },
+      {
+        path: "menu",
+        name: "pureMenu",
+        component: () =>
+          import(/* webpackChunkName: "menu" */ "../views/Menu.vue"),
+      },
+    ],
   },
   {
-    path: "/Menu",
-    name: "Menu",
-    component: () => import(/* webpackChunkName: "menu" */ "../views/Menu.vue"),
-  },
-  {
-    path: "/MenuTb",
-    name: "MenuTb",
-    component: () =>
-      import(/* webpackChunkName: "MenuTb" */ "../views/MenuTb.vue"),
+    path: "/Root",
+    name: "Root",
+    component: () => import(/* webpackChunkName: "Root" */ "../views/Root.vue"),
+    children: [
+      {
+        path: "choose",
+        name: "rootChoose",
+        component: () =>
+          import(/* webpackChunkName: "choose" */ "../views/Choose.vue"),
+      },
+      {
+        path: "menu",
+        name: "rootMenu",
+        component: () =>
+          import(/* webpackChunkName: "menu" */ "../views/Menu.vue"),
+      },
+      {
+        path: "menuTb",
+        name: "rootMenuTb",
+        component: () =>
+          import(/* webpackChunkName: "MenuTb" */ "../views/MenuTb.vue"),
+      },
+    ],
   },
   {
     path: "/Condiment",
