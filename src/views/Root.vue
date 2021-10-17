@@ -31,10 +31,14 @@
     <a-layout>
       <!-- <a-layout-header class="layout-header">ceshi</a-layout-header> -->
       <a-layout-content class="layout-content">
-        欢迎来到管理者模式
         <div>
           <suspense>
-            <router-view />
+            <router-view v-slot="{ Component }">
+              <!-- <keep-alive>
+                <component :is="Component" v-if="$route.meta.keepAlive" />
+              </keep-alive> -->
+              <component :is="Component" v-if="!$route.meta.keepAlive" />
+            </router-view>
           </suspense>
         </div>
       </a-layout-content>

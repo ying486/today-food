@@ -6,6 +6,7 @@ export const menuTbColumns = [
   {
     title: "名称",
     dataIndex: "foodName",
+    width: 100,
   },
   {
     title: "类型",

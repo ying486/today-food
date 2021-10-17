@@ -94,12 +94,12 @@ const menuDb = {
   },
 
   /**
-   * @function 查询
+   * @function 带搜索框查询
    * @param selVal {Object} 筛选条件
    * @param searchVal {String} 搜索内容
    * @return {Array} 包含所有菜品对象的数组
    */
-  getBySelect: async (selVal, searchVal) => {
+  getBySelectWithSearch: async (selVal, searchVal) => {
     const handleObj = delNullprop(selVal);
     let flag = Object.keys(handleObj).length;
 
@@ -117,10 +117,13 @@ const menuDb = {
    * @param data {Array} 食物类型
    * @return {Object} 菜品对象信息
    */
-  getRandomItem: async (data) => {
+  getRandomItem: async (foodType, season) => {
+    console.log("foodType", foodType, "season", season);
     let foodArr = await db
       .where("foodType")
-      .anyOf(data)
+      .anyOf(foodType)
+      .or("season")
+      .anyOf(season)
       .toArray()
       .catch((err) => {
         console.error("err", err);
@@ -130,7 +133,7 @@ const menuDb = {
       let index = Math.floor(Math.random() * foodArr.length);
       return foodArr[index];
     } else {
-      return { foodType: data, err: "暂无相关菜品，请重新选择" };
+      return { foodType, err: "暂无相关菜品，请重新选择" };
     }
   },
 };

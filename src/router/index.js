@@ -32,6 +32,9 @@ const routes = [
       {
         path: "choose",
         name: "rootChoose",
+        // meta: {
+        //   keepAlive: true,
+        // },
         component: () =>
           import(/* webpackChunkName: "choose" */ "../views/Choose.vue"),
       },
