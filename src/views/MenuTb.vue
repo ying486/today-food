@@ -5,16 +5,16 @@
         {{ `共有 ${foodList.length} 条数据` }}
       </span>
       <div class="btn-container">
-        <g-button tip="导入"
+        <g-button tip="导入" @click="onUploadExl"
           ><template #icon><ImportOutlined /></template
         ></g-button>
-        <g-button tip="导出"
+        <g-button tip="导出" @click="onExportExl"
           ><template #icon><ExportOutlined /></template
         ></g-button>
-        <g-button tip="添加"
+        <g-button tip="添加" @click="onShowAddModal"
           ><template #icon><PlusSquareOutlined /></template
         ></g-button>
-        <g-button tip="删除"
+        <g-button tip="删除" @click="onDel"
           ><template #icon><DeleteOutlined /></template
         ></g-button>
       </div>
@@ -27,13 +27,11 @@
       }"
       :columns="menuTbColumns"
       :data-source="foodList"
+      :pagination="{ pageSize: 5 }"
     >
       <template #foodType="{ text: foodType }">
-        <a-tag
-          v-for="item in foodTypeCvrt(foodType)"
-          :key="item"
-          :color="volcano"
-        >
+        <a-tag v-for="item in foodTypeCvrt(foodType)" :key="item">
+          <!-- :color="volcano" -->
           {{ item }}
         </a-tag>
       </template>
@@ -45,7 +43,6 @@
       <template #action="{ record }">
         <span @click="onShowEditModal(record)">
           <FormOutlined :style="{ fontSize: '20px' }" />
-          <!-- <a>edit</a> -->
         </span>
       </template>
     </a-table>
