@@ -14,8 +14,8 @@
         v-model:value="form[item.key]"
         allowClear
         placeholder="请选择"
-        :mode="item.mode ? item.mode : 'default'"
         :maxTagCount="3"
+        :mode="item.mode ? item.mode : undefined"
         @change="onChange"
       >
         <a-select-option

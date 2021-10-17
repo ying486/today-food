@@ -10,10 +10,10 @@
       ref="formRef"
       :model="formState"
       :rules="addMenuRules"
-      :label-col="labelCol"
-      :wrapper-col="wrapperCol"
+      :label-col="{ span: 4 }"
+      :wrapper-col="{ span: 18 }"
     >
-      <a-form-item label="菜品名" name="foodName">
+      <a-form-item label="菜品名称" name="foodName">
         <a-input
           v-model:value="formState.foodName"
           placeholder="请输入菜品名称"
@@ -35,16 +35,6 @@
           :options="seasonEnum"
         />
       </a-form-item>
-      <a-form-item label="原料" name="material">
-        <a-select
-          v-model:value="formState.material"
-          placeholder="请选择或输入原料"
-          mode="tags"
-        >
-          <a-select-option value="1">肉</a-select-option>
-          <a-select-option value="2">面</a-select-option>
-        </a-select>
-      </a-form-item>
       <a-form-item label="描述" name="desc">
         <a-textarea v-model:value="formState.desc" />
       </a-form-item>
@@ -62,15 +52,16 @@ export default defineComponent({
     data: Object, // 食物信息
     title: String, // 标题
   },
-  emits: {
-    reData: (val) => {
-      if (val) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-  },
+  // emits: {
+  //   reData: (val) => {
+  //     console.log(val, "val");
+  //     if (val.foodName) {
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   },
+  // },
   setup(props, { emit }) {
     const { visible, data } = toRefs(props);
     const formRef = ref();
