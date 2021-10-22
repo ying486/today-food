@@ -4,6 +4,11 @@
       <span>
         {{ `共有 ${foodList.length} 条数据` }}
       </span>
+      <select-panel
+        class="select-panel"
+        :config="foodSelect"
+        @selData="selData"
+      />
       <div class="btn-container">
         <g-button tip="导入" @click="onUploadExl"
           ><template #icon><ImportOutlined /></template
@@ -71,6 +76,8 @@ import {
   PlusSquareOutlined,
 } from "@ant-design/icons-vue";
 import gButton from "../components/g-button.vue";
+import SelectPanel from "../components/SelectPanel.vue";
+import { foodSelect } from "./config/selectPanel";
 import addMenuModal from "./modals/addMenuModal.vue";
 import { menuTbColumns } from "./config/colums";
 import Excel from "../utils/excel";
@@ -85,6 +92,7 @@ export default defineComponent({
     ExportOutlined,
     DeleteOutlined,
     PlusSquareOutlined,
+    SelectPanel,
     gButton,
   },
   async setup() {
@@ -112,8 +120,19 @@ export default defineComponent({
       });
     };
 
+    // 多选
     const onSelectChange = (selectedRowKeys) => {
       state.selectedRowKeys = selectedRowKeys;
+    };
+
+    // 搜索面板
+    const selData = async (data) => {
+      console.log(toRaw(data), "data");
+      const { foodType, season, search } = toRaw(data);
+      state.foodList = await $menuDb.getBySelectWithSearch(
+        { foodType, season },
+        search
+      );
     };
 
     // 显示添加模态框
@@ -194,9 +213,11 @@ export default defineComponent({
     init();
 
     return {
-      menuTbColumns,
       ...toRefs(state),
+      menuTbColumns,
+      foodSelect,
       // func
+      selData,
       onSelectChange,
       onShowAddModal,
       getAddData,
@@ -217,6 +238,11 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    .select-panel {
+      width: 700px;
+      height: 32px;
+    }
   }
 }
 </style>
