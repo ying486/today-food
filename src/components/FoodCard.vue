@@ -1,11 +1,11 @@
 <template>
   <div class="food-card" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
-    <div class="front">
+    <div class="front" :style="seasonStyle">
       <div class="name">{{ name }}</div>
       <a-tag class="tag">{{ typeStr }}</a-tag>
     </div>
     <!-- 背面 -->
-    <div class="back">
+    <div class="back" :style="seasonStyle">
       <span class="desc">
         {{ desc }}
       </span>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, toRefs, watch } from "vue";
+import { defineComponent, ref, toRefs, watch, computed } from "vue";
 import { foodTypeEnum } from "@/views/enum";
 
 export default defineComponent({
@@ -23,7 +23,7 @@ export default defineComponent({
     name: String,
     typeList: Array,
     desc: String,
-    // season: String,
+    season: Array,
     // 卡片翻转
     flip: {
       type: Boolean,
@@ -31,9 +31,16 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { typeList, flip } = toRefs(props);
+    const { typeList, flip, season } = toRefs(props);
     let typeStr = ref("");
-    // const color = ["#014483", "#03a877", "#a30404", "#0082aa"];
+    const color = ["#f0f2f5", "#F7FFED", "#FEF1F0", "#FEF7E6", "#E9FFFB"];
+    // 获取当前季节
+    const seasonStyle = computed(() => {
+      return {
+        "box-shadow": `0 0 10px 10px ${color[season.value[0]]} inset`,
+      };
+    });
+
     // 食物类型枚举转化
     const foodTypeCvrt = (arr) => {
       return arr.map((item) => {
@@ -68,6 +75,8 @@ export default defineComponent({
 
     return {
       typeStr,
+      seasonStyle,
+      // func
       onMouseEnter,
       onMouseLeave,
     };

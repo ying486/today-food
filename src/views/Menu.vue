@@ -7,6 +7,7 @@
         v-for="item in pageList"
         :key="item.foodId"
         :name="item.foodName"
+        :season="item.season"
         :typeList="item.foodType"
         :desc="item.desc"
       />
@@ -52,7 +53,10 @@ export default defineComponent({
     const selData = async (data) => {
       console.log(toRaw(data), "data");
       const { foodType, season, search } = toRaw(data);
-      state.foodList = await $menuDb.getBySelect({ foodType, season }, search);
+      state.foodList = await $menuDb.getBySelectWithSearch(
+        { foodType, season },
+        search
+      );
       onPageChange(currentPage.value, PAGE_SIZE);
     };
 
