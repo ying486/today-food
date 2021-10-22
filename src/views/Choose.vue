@@ -1,5 +1,7 @@
 <template>
   <div class="choose-container">
+    注意：抽取会在含以下点亮标签的菜品中选择
+    <g-checkbox-btn v-model="seasonList" :config="seasonEnum"></g-checkbox-btn>
     <div class="card-container">
       <div v-for="(item, index) in chooseList" :key="index">
         <!-- 选择卡 -->
@@ -22,6 +24,7 @@
           v-if="item.foodId"
           :name="item.foodName"
           :typeList="item.foodType"
+          :season="item.season"
           :desc="item.desc"
           :flip="false"
           @click="onLocked(index)"
@@ -55,35 +58,59 @@ import {
   reactive,
   toRefs,
   ref,
-  // toRaw,
+  toRaw,
   getCurrentInstance,
+  // computed,
 } from "vue";
 import { Modal, message } from "ant-design-vue";
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons-vue";
-import { foodTypeEnum } from "./enum";
+import { foodTypeEnum, seasonEnum } from "./enum";
 import foodCard from "../components/FoodCard.vue";
+import GCheckboxBtn from "../components/g-checkbox-btn.vue";
 
 export default defineComponent({
-  components: { foodCard, PlusOutlined, MinusOutlined },
+  components: { foodCard, GCheckboxBtn, PlusOutlined, MinusOutlined },
   async setup() {
     const { $menuDb } = getCurrentInstance().appContext.config.globalProperties; // menu数据库方法
     const { $dailyLogDB } =
       getCurrentInstance().appContext.config.globalProperties; // dailyLogDB数据库方法
     let state = reactive({
+      // 抽取的卡片列表
       chooseList: [
         {
           foodType: ["hc"],
+          locked: false,
         },
         {
           foodType: ["sc"],
+          locked: false,
         },
         {
           foodType: ["zs"],
+          locked: false,
         },
       ],
+      // 卡片季节限定列表
+      seasonList: ["0"],
     });
     let showAddCard = ref(true); // 控制添加卡的显示隐藏
     let showBtnBar = ref(true); // 控制操作按钮隐藏
+
+    // 获取当前季节
+    const currentSeason = () => {
+      const today = new Date();
+      const month = today.getMonth() + 1;
+      if ([1, 2, 3].includes(month)) {
+        return ["0", "1"];
+      } else if ([4, 5, 6].includes(month)) {
+        return ["0", "2"];
+      } else if ([7, 8, 9].includes(month)) {
+        return ["0", "3"];
+      } else {
+        return ["0", "4"];
+      }
+    };
+    state.seasonList = currentSeason();
 
     // 随机抽取菜品
     const onRandomFood = async () => {
@@ -95,10 +122,15 @@ export default defineComponent({
       state.chooseList.forEach(async (item, i, arr) => {
         // 只抽取数组中未被锁定的
         if (!arr[i].locked) {
-          arr[i] = await $menuDb.getRandomItem(item.foodType);
+          arr[i] = await $menuDb.getRandomItem(
+            toRaw(item.foodType),
+            toRaw(state.seasonList)
+          );
           arr[i].locked = false;
         }
       });
+      console.log(state.chooseList, "chose");
+      message.success("抽取成功");
     };
 
     // 重置全部选择卡
@@ -144,19 +176,24 @@ export default defineComponent({
 
     // 添加当天记录
     const onRecord = () => {
+      let data = [];
+      for (let item of state.chooseList) {
+        if (!item.foodId) {
+          message.info("有卡片未完成抽取！");
+          return;
+        }
+        data.push({
+          foodId: item.foodId,
+          foodName: item.foodName,
+        });
+      }
       Modal.confirm({
         title: "提示",
-        content: "是否添加记录？",
+        content: "是否添加记录？（记录后，将会录入数据统计）",
         okText: "确定",
         cancelText: "取消",
         onOk() {
           showBtnBar.value = false;
-          let data = state.chooseList.map((item) => {
-            return {
-              foodId: item.foodId,
-              foodName: item.foodName,
-            };
-          });
           $dailyLogDB.addData({ foodArr: data });
         },
       });
@@ -165,7 +202,10 @@ export default defineComponent({
       ...toRefs(state),
       showAddCard,
       showBtnBar,
+      seasonEnum,
       foodTypeEnum,
+      currentSeason,
+      // func
       onRandomFood,
       onResetAll,
       onReset,
