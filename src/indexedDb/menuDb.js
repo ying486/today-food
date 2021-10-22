@@ -120,10 +120,9 @@ const menuDb = {
   getRandomItem: async (foodType, season) => {
     console.log("foodType", foodType, "season", season);
     let foodArr = await db
-      .where("foodType")
-      .anyOf(foodType)
-      .or("season")
+      .where("season")
       .anyOf(season)
+      .and((item) => item.foodType.includes(foodType[0]))
       .toArray()
       .catch((err) => {
         console.error("err", err);
